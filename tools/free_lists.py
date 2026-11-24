@@ -280,13 +280,17 @@ def first(v):
 
 
 def is_free(licence, year):
-    """Creative Commons: the uploader licenses the film. Public-domain mark: only trusted for films
-    made before 1930, because many later uploads carry that mark without being free of rights."""
+    """Public-domain marks are trusted for films made before 1930, Creative Commons licences for films
+    made since 1990: in between, many uploads carry a free licence they do not actually have."""
     if not FREE_LICENCE.search(licence):
         return False
+    if not year.isdigit():
+        return False
     if "publicdomain" in licence.lower():
-        return year.isdigit() and int(year) < 1930
-    return True
+        return int(year) < 1930
+    # Old classics are often re-uploaded with a Creative Commons tag they do not have;
+    # recent films with such a licence are usually posted by their own makers.
+    return int(year) >= 1990
 
 
 try:
