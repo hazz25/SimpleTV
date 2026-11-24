@@ -23,11 +23,31 @@ jobs:
         with:
           gradle-version: "8.11.1"
 
+      - name: Decrypt signing key
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::error::Le secret SIGNING_KEY est manquant (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 300000 \
+            -in keystore/simpletv.jks.enc -out keystore/simpletv.jks -pass env:SIGNING_KEY
+
       - name: Build
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         run: gradle :app:assembleRelease -PversionCode=${{ github.run_number }} --stacktrace
 
+      - name: Check signature
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs app/build/outputs/apk/release/app-release.apk | head -3
+
       - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk SimpleTV.apk
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk SimpleTV.apk
+          rm -f keystore/simpletv.jks
 
       - uses: actions/upload-artifact@v4
         with:

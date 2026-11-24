@@ -18,23 +18,24 @@ android {
         versionName = "1.0.$buildNumber"
     }
 
-    // One fixed key, so updates install over the old version without uninstalling.
+    // Releases are signed with a private key. The key file is stored encrypted in the repository
+    // and the build decrypts it with the SIGNING_KEY secret, which only GitHub knows.
+    val signingKey: String? = System.getenv("SIGNING_KEY")?.takeIf { it.isNotBlank() }
     signingConfigs {
         create("release") {
-            storeFile = file("../keystore/simpletv.jks")
-            storePassword = "simpletv"
-            keyAlias = "simpletv"
-            keyPassword = "simpletv"
+            if (signingKey != null) {
+                storeFile = file("../keystore/simpletv.jks")
+                storePassword = signingKey
+                keyAlias = "simpletv"
+                keyPassword = signingKey
+            }
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
-        }
-        debug {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (signingKey != null) signingConfigs.getByName("release") else null
         }
     }
 
