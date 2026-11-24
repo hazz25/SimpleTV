@@ -11,7 +11,10 @@ import com.simpletv.app.BuildConfig
 import com.simpletv.app.R
 import com.simpletv.app.data.Prefs
 import com.simpletv.app.data.Repo
+import com.simpletv.app.data.Updater
 import com.simpletv.app.data.UserInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -95,9 +98,42 @@ class SettingsActivity : BaseActivity() {
                 }
             },
             Item("Changer de compte", "Se connecter avec un autre code Xtream") { confirmLogout() },
-            Item("Version", "Simple TV ${BuildConfig.VERSION_NAME}", null),
+            Item("Mises à jour", updateLine()) { onUpdateClick() },
         )
         adapter.items = items.map { RowAdapter.Row(title = it.title, sub = it.value) }
+    }
+
+    private var checking = false
+
+    private fun updateLine(): String {
+        val current = "Version installée : ${BuildConfig.VERSION_NAME}"
+        val latest = Updater.latest
+        return when {
+            checking -> "$current\nRecherche d'une mise à jour…"
+            latest != null && Updater.hasUpdate() -> "$current\nNouvelle version ${latest.versionName} disponible : OK pour l'installer"
+            Updater.checked -> "$current\nVous avez la dernière version. OK pour vérifier à nouveau"
+            else -> "$current\nOK pour rechercher une mise à jour"
+        }
+    }
+
+    private fun onUpdateClick() {
+        val latest = Updater.latest
+        if (latest != null && Updater.hasUpdate()) {
+            installUpdate(latest)
+            return
+        }
+        if (checking) return
+        checking = true
+        refresh()
+        lifecycleScope.launch {
+            try {
+                withContext(Dispatchers.IO) { Updater.check() }
+            } catch (e: Exception) {
+                toast("Vérification impossible : ${errorText(e)}")
+            }
+            checking = false
+            refresh()
+        }
     }
 
     private fun onItemClick(position: Int) {

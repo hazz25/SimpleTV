@@ -41,7 +41,6 @@ class VodActivity : BaseActivity() {
     private val catAdapter = RowAdapter(
         onClick = ::onCategoryClick,
         onLongClick = ::onCategoryLongClick,
-        onFocus = ::onCategoryFocus,
     )
     private val posterAdapter = PosterAdapter(onClick = ::onPosterClick, onLongClick = ::onPosterLongClick)
 
@@ -166,14 +165,6 @@ class VodActivity : BaseActivity() {
         catList.post { catList.findViewHolderForAdapterPosition(idx)?.itemView?.requestFocus() }
     }
 
-    private fun onCategoryFocus(position: Int) {
-        pendingCategory?.let { handler.removeCallbacks(it) }
-        val id = cats.getOrNull(position)?.id ?: return
-        if (id == currentCat) return
-        val r = Runnable { showCategory(id) }
-        pendingCategory = r
-        handler.postDelayed(r, 300)
-    }
 
     private fun onCategoryClick(position: Int) {
         pendingCategory?.let { handler.removeCallbacks(it) }

@@ -48,7 +48,6 @@ class LiveActivity : BaseActivity() {
     private val catAdapter = RowAdapter(
         onClick = ::onCategoryClick,
         onLongClick = ::onCategoryLongClick,
-        onFocus = ::onCategoryFocus,
     )
     private val chAdapter = RowAdapter(
         onClick = ::onChannelClick,
@@ -184,15 +183,6 @@ class LiveActivity : BaseActivity() {
         chList.post { chList.findViewHolderForAdapterPosition(index)?.itemView?.requestFocus() }
     }
 
-    /** Moving through categories opens them after a short pause, like a TV menu. */
-    private fun onCategoryFocus(position: Int) {
-        pendingCategory?.let { handler.removeCallbacks(it) }
-        val id = cats.getOrNull(position)?.id ?: return
-        if (id == currentCat) return
-        val r = Runnable { showCategory(id) }
-        pendingCategory = r
-        handler.postDelayed(r, 300)
-    }
 
     private fun onCategoryClick(position: Int) {
         pendingCategory?.let { handler.removeCallbacks(it) }

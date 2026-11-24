@@ -8,6 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import com.simpletv.app.R
 import com.simpletv.app.data.Prefs
 import com.simpletv.app.data.Repo
+import com.simpletv.app.data.Updater
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -43,6 +46,38 @@ class HomeActivity : BaseActivity() {
 
         findViewById<View>(R.id.tileLive).requestFocus()
         loadAccount()
+        checkForUpdate()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::status.isInitialized) showUpdate()
+    }
+
+    /** Looks once per launch for a newer version on GitHub. */
+    private fun checkForUpdate() {
+        lifecycleScope.launch {
+            if (!Updater.checked) {
+                try {
+                    withContext(Dispatchers.IO) { Updater.check() }
+                } catch (e: Exception) {
+                    return@launch // no internet or GitHub unreachable: try again next launch
+                }
+            }
+            showUpdate()
+        }
+    }
+
+    private fun showUpdate() {
+        val banner = findViewById<TextView>(R.id.updateBanner)
+        val release = Updater.latest
+        if (release == null || !Updater.hasUpdate()) {
+            banner.show(false)
+            return
+        }
+        banner.text = "⬆  Nouvelle version ${release.versionName} disponible  •  OK pour l'installer"
+        banner.setOnClickListener { installUpdate(release) }
+        banner.show(true)
     }
 
     private fun click(id: Int, action: () -> Unit) {

@@ -175,12 +175,22 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/updateBanner"
+        style="@style/Btn"
+        android:layout_below="@id/tiles"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="0dp"
+        android:textColor="@color/gold"
+        android:visibility="gone" />
+
+    <TextView
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tiles"
+        android:layout_below="@id/updateBanner"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         android:textColor="@color/text_dim"
         android:textSize="15sp" />
 </RelativeLayout>

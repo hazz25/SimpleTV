@@ -3,12 +3,22 @@ package com.simpletv.app.ui
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.simpletv.app.R
+import com.simpletv.app.data.Updater
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -63,6 +73,58 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+    /** Downloads the new version and opens Android's installer. */
+    protected fun installUpdate(release: Updater.Release) {
+        if (Build.VERSION.SDK_INT >= 26 && !packageManager.canRequestPackageInstalls()) {
+            AlertDialog.Builder(this)
+                .setTitle("Autoriser les mises à jour")
+                .setMessage(
+                    "Pour s'installer, la mise à jour a besoin d'une autorisation, à donner une seule fois.\n\n" +
+                        "Sur l'écran suivant, activez Simple TV, puis revenez ici et relancez la mise à jour.",
+                )
+                .setPositiveButton("Ouvrir les réglages") { _, _ ->
+                    try {
+                        startActivity(
+                            Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")),
+                        )
+                    } catch (e: Exception) {
+                        toast("Réglage introuvable : mettez à jour avec Downloader (code 8977165).")
+                    }
+                }
+                .setNegativeButton("Annuler", null)
+                .show()
+            return
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Mise à jour ${release.versionName}")
+            .setMessage("Téléchargement… 0 %")
+            .setCancelable(false)
+            .show()
+        lifecycleScope.launch {
+            try {
+                val file = withContext(Dispatchers.IO) {
+                    Updater.download(this@BaseActivity, release.apkUrl) { pct ->
+                        runOnUiThread { dialog.setMessage("Téléchargement… $pct %") }
+                    }
+                }
+                dialog.dismiss()
+                val uri = if (Build.VERSION.SDK_INT >= 24) {
+                    FileProvider.getUriForFile(this@BaseActivity, "$packageName.updates", file)
+                } else {
+                    Uri.fromFile(file)
+                }
+                startActivity(
+                    Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(uri, "application/vnd.android.package-archive")
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK),
+                )
+            } catch (e: Exception) {
+                dialog.dismiss()
+                toast("Mise à jour impossible : ${errorText(e)}")
+            }
+        }
+    }
 
     protected fun View.show(visible: Boolean) {
         visibility = if (visible) View.VISIBLE else View.GONE
