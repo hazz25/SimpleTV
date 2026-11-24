@@ -3,6 +3,7 @@ package com.simpletv.app.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
@@ -54,6 +55,12 @@ class LoginActivity : BaseActivity() {
             }
         }
         connect.setOnClickListener { submit() }
+        // On a phone held upright the form takes the full width.
+        val scroll = findViewById<View>(R.id.scroll)
+        val widthDp = resources.displayMetrics.widthPixels / resources.displayMetrics.density
+        if (widthDp < 560f) {
+            scroll.layoutParams = scroll.layoutParams.apply { width = ViewGroup.LayoutParams.MATCH_PARENT }
+        }
         server.requestFocus()
     }
 

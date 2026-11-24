@@ -10,6 +10,11 @@
         <item name="android:textColorSecondary">@color/text_dim</item>
     </style>
 
+    <!-- Screens with a keyboard keep the status bar so the layout can shrink above the keyboard. -->
+    <style name="AppTheme.Typing">
+        <item name="android:windowFullscreen">false</item>
+    </style>
+
     <style name="Tile">
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center</item>

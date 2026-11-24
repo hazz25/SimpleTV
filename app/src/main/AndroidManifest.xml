@@ -20,7 +20,8 @@
         <activity
             android:name=".ui.HomeActivity"
             android:exported="true"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -28,15 +29,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.LoginActivity" android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ui.LiveActivity" />
-        <activity android:name=".ui.VodActivity" />
-        <activity android:name=".ui.MovieDetailActivity" />
-        <activity android:name=".ui.SeriesDetailActivity" />
-        <activity android:name=".ui.SearchActivity" android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ui.SettingsActivity" />
+        <activity android:name=".ui.LoginActivity" android:theme="@style/AppTheme.Typing" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.LiveActivity" android:screenOrientation="sensorLandscape" />
+        <activity android:name=".ui.VodActivity" android:screenOrientation="sensorLandscape" />
+        <activity android:name=".ui.MovieDetailActivity" android:screenOrientation="sensorLandscape" />
+        <activity android:name=".ui.SeriesDetailActivity" android:screenOrientation="sensorLandscape" />
+        <activity android:name=".ui.SearchActivity" android:theme="@style/AppTheme.Typing" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.SettingsActivity" android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".ui.PlayerActivity"
+            android:screenOrientation="sensorLandscape"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize" />
     </application>
 </manifest>

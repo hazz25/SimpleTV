@@ -3,7 +3,9 @@ package com.simpletv.app.ui
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.GestureDetector
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
@@ -172,6 +174,35 @@ class PlayerActivity : BaseActivity() {
     private fun zap(delta: Int) {
         if (items.size < 2) return
         play((index + delta + items.size) % items.size)
+    }
+
+    /** Phones, live TV: swipe up or down to change channel, tap to see what is on. */
+    private val gestures by lazy {
+        GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean = true
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                (current as? PlayItem.Live)?.let { showLiveInfo(it.stream) }
+                return true
+            }
+
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                val start = e1 ?: return false
+                val dy = e2.y - start.y
+                val dx = e2.x - start.x
+                if (Math.abs(dy) < 80 || Math.abs(dy) < Math.abs(dx)) return false
+                zap(if (dy < 0) 1 else -1) // swipe up: next channel
+                return true
+            }
+        })
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (isLive) {
+            gestures.onTouchEvent(ev)
+            return true
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {

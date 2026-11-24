@@ -1,6 +1,8 @@
 package com.simpletv.app.ui
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -13,6 +15,10 @@ import java.util.Locale
 
 /** Top bar, clock and small helpers shared by every screen. */
 open class BaseActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(UiScale.wrap(newBase))
+    }
 
     protected fun setupTopBar(current: String) {
         val items = listOf(
@@ -67,6 +73,28 @@ open class BaseActivity : AppCompatActivity() {
         is java.net.SocketTimeoutException -> "Le serveur ne répond pas. Réessayez dans un instant."
         is java.net.ConnectException -> "Connexion au serveur impossible."
         else -> e.message ?: "Erreur inconnue"
+    }
+}
+
+/**
+ * The screens are laid out for a 960 × 540 TV canvas. On a phone that is smaller than that,
+ * everything is shrunk to fit instead of being cut off, so the app looks the same as on the TV.
+ */
+object UiScale {
+    private const val CANVAS_W = 960f
+    private const val CANVAS_H = 540f
+
+    fun wrap(ctx: Context): Context {
+        val res = ctx.resources
+        val dm = res.displayMetrics
+        val long = maxOf(dm.widthPixels, dm.heightPixels).toFloat()
+        val short = minOf(dm.widthPixels, dm.heightPixels).toFloat()
+        if (long <= 0f || short <= 0f) return ctx
+        val fit = minOf(long / CANVAS_W, short / CANVAS_H) // pixels per dp that make the canvas fit
+        if (fit >= dm.density) return ctx // TVs and tablets: already big enough
+        val conf = Configuration(res.configuration)
+        conf.densityDpi = (fit * 160f).toInt().coerceAtLeast(80)
+        return ctx.createConfigurationContext(conf)
     }
 }
 
