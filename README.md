@@ -1,5 +1,9 @@
 # Simple TV
 
+## ⬇ [Télécharger Simple TV (APK)](https://github.com/hazz25/SimpleTV/releases/latest/download/SimpleTV.apk)
+
+Code Downloader : **7525486**
+
 Lecteur IPTV simple pour Android TV, Google TV, Fire TV et box Android, avec un code Xtream.
 
 - Accueil à grandes tuiles : TV en direct, Films, Séries, Favoris, Recherche
@@ -12,12 +16,15 @@ L'application ne fournit aucun contenu : elle lit uniquement l'abonnement saisi 
 ## Installer sur la TV
 
 1. Installez l'application **Downloader** et autorisez-la à installer des applications inconnues.
-2. Dans Downloader, saisissez l'adresse :
-   `https://github.com/<utilisateur>/simpletv/releases/latest/download/SimpleTV.apk`
+2. Dans Downloader, tapez le code **7525486**, puis choisissez le lien **Télécharger Simple TV (APK)** en haut de cette page.
+   Vous pouvez aussi saisir directement l'adresse :
+   `github.com/hazz25/SimpleTV/releases/latest/download/SimpleTV.apk`
 3. Installez, ouvrez Simple TV et saisissez votre code Xtream.
 
-Chaque modification du code produit automatiquement un nouvel APK (onglet **Actions**, puis **Releases**).
-Pour mettre à jour, refaites l'étape 2 : la nouvelle version s'installe par-dessus l'ancienne.
+Vos identifiants restent sur la TV : ils ne sont jamais envoyés ni enregistrés sur GitHub.
+
+Chaque modification du code produit automatiquement un nouvel APK (onglet **Releases**).
+Pour mettre à jour, refaites l'étape 2 : la nouvelle version s'installe par-dessus l'ancienne, sans perdre le compte ni les favoris.
 
 ## Utilisation à la télécommande
 
