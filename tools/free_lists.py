@@ -253,6 +253,12 @@ ARCHIVE_LANGS = {
     "ara": "language:(Arabic OR ara OR عربي OR العربية)",
 }
 VIDEO_FORMATS = ["h.264", "h.264 IA", "MPEG4", "512Kb MPEG4"]
+# Only films whose page states a public-domain mark or a Creative Commons licence: the
+# "feature_films" collection also holds uploads that are not free of rights.
+LICENCE_QUERY = "(licenseurl:*publicdomain* OR licenseurl:*creativecommons.org/licenses*)"
+FREE_LICENCE = re.compile(r"creativecommons\.org/(publicdomain|licenses)/", re.I)
+ADULT = re.compile(r"erot|sex|porn|xxx|adult|nud|libertin|x-rated|perver|uncensored", re.I)
+ADULT_QUERY = "NOT subject:(erotic OR erotica OR sex OR sexploitation OR adult OR xxx OR porn OR nudity)"
 
 
 def get_json(url):
@@ -270,7 +276,7 @@ movies = []
 archive_error = None
 try:
     for lang, lang_query in ARCHIVE_LANGS.items():
-        q = f"collection:(feature_films) AND mediatype:(movies) AND {lang_query}"
+        q = f"collection:(feature_films) AND mediatype:(movies) AND {lang_query} AND {LICENCE_QUERY} AND {ADULT_QUERY}"
         params = urllib.parse.urlencode(
             [("q", q), ("fl[]", "identifier"), ("fl[]", "title"), ("fl[]", "year"),
              ("sort[]", "downloads desc"), ("rows", "250"), ("output", "json")]
@@ -291,6 +297,16 @@ try:
             if not video:
                 continue
             m = meta.get("metadata", {})
+            licence = m.get("licenseurl") or ""
+            if isinstance(licence, list):
+                licence = licence[0]
+            subjects = m.get("subject") or ""
+            if isinstance(subjects, list):
+                subjects = " ".join(subjects)
+            if not FREE_LICENCE.search(licence):
+                continue
+            if ADULT.search(f"{m.get('title', '')} {subjects} {ident}"):
+                continue
             title = m.get("title") or d.get("title") or ident
             if isinstance(title, list):
                 title = title[0]
@@ -306,12 +322,13 @@ try:
                 "duration": runtime if isinstance(runtime, str) else "",
                 "poster": f"https://archive.org/services/img/{ident}",
                 "url": f"https://archive.org/download/{urllib.parse.quote(ident)}/{urllib.parse.quote(video['name'])}",
-                "category": f"{LANGS[lang]} · Films du domaine public",
+                "category": f"{LANGS[lang]} · Films libres de droits",
+                "licence": licence,
             })
 except Exception as e:  # keep the live list even if the Archive is unreachable
     archive_error = str(e)
 
-if movies or not (out_dir / "movies.json").exists():
+if archive_error is None or not (out_dir / "movies.json").exists():
     (out_dir / "movies.json").write_text(json.dumps(movies, ensure_ascii=False, indent=1), encoding="utf-8")
 
 # ---- Report --------------------------------------------------------------------------------
@@ -320,7 +337,7 @@ report = [f"Chaînes : {len(channels_out)}"]
 report += [f"  {g} : {n}" for g, n in counts.items()]
 both = sum(1 for c in channels_out if len(c["sources"]) > 1)
 report.append(f"  présentes dans les deux sources : {both}")
-report.append(f"Films du domaine public : {len(movies)}")
+report.append(f"Films libres de droits : {len(movies)}")
 for cat in sorted({m['category'] for m in movies}):
     report.append(f"  {cat} : {sum(1 for m in movies if m['category'] == cat)}")
 if archive_error:
