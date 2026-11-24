@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="32dp">
+
+    <TextView
+        android:id="@+id/clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/text"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/expiry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="end"
+        android:textColor="@color/text_dim"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="@string/app_name"
+        android:textColor="@color/text"
+        android:textSize="44sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tagline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo"
+        android:layout_centerHorizontal="true"
+        android:text="@string/tagline"
+        android:textColor="@color/text_dim"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/tiles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tagline"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/tileLive"
+            style="@style/Tile"
+            android:layout_width="250dp"
+            android:layout_height="236dp">
+
+            <TextView
+                style="@style/TileIcon"
+                android:text="📺"
+                android:textSize="64sp" />
+
+            <TextView
+                style="@style/TileLabel"
+                android:text="@string/live"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/tileMovies"
+                style="@style/Tile"
+                android:layout_width="170dp"
+                android:layout_height="112dp">
+
+                <TextView style="@style/TileIcon" android:text="🎬" />
+
+                <TextView style="@style/TileLabel" android:text="@string/movies" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileFav"
+                style="@style/Tile"
+                android:layout_width="170dp"
+                android:layout_height="112dp"
+                android:layout_marginTop="12dp">
+
+                <TextView style="@style/TileIcon" android:text="⭐" />
+
+                <TextView style="@style/TileLabel" android:text="@string/favorites" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/tileSeries"
+                style="@style/Tile"
+                android:layout_width="170dp"
+                android:layout_height="112dp">
+
+                <TextView style="@style/TileIcon" android:text="🎞" />
+
+                <TextView style="@style/TileLabel" android:text="@string/series" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tileSearch"
+                style="@style/Tile"
+                android:layout_width="170dp"
+                android:layout_height="112dp"
+                android:layout_marginTop="12dp">
+
+                <TextView style="@style/TileIcon" android:text="🔍" />
+
+                <TextView style="@style/TileLabel" android:text="@string/search" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/btnSettings"
+                style="@style/SideButton"
+                android:layout_width="220dp"
+                android:layout_height="70dp">
+
+                <TextView style="@style/TileIcon" android:textSize="26sp" android:text="⚙" />
+
+                <TextView style="@style/SideLabel" android:text="@string/settings" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnReload"
+                style="@style/SideButton"
+                android:layout_width="220dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="13dp">
+
+                <TextView style="@style/TileIcon" android:textSize="26sp" android:text="🔄" />
+
+                <TextView style="@style/SideLabel" android:text="@string/reload" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnExit"
+                style="@style/SideButton"
+                android:layout_width="220dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="13dp">
+
+                <TextView style="@style/TileIcon" android:textSize="26sp" android:text="✖" />
+
+                <TextView style="@style/SideLabel" android:text="@string/exit" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tiles"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/text_dim"
+        android:textSize="15sp" />
+</RelativeLayout>

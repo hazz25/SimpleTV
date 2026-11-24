@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Simple TV</string>
+    <string name="tagline">Votre TV, simplement</string>
+    <string name="home">Accueil</string>
+    <string name="live">TV en direct</string>
+    <string name="movies">Films</string>
+    <string name="series">Séries</string>
+    <string name="favorites">Favoris</string>
+    <string name="search">Rechercher</string>
+    <string name="settings">Paramètres</string>
+    <string name="reload">Recharger</string>
+    <string name="exit">Quitter</string>
+    <string name="loading">Chargement…</string>
+    <string name="pick_channel">Choisissez une chaîne</string>
+    <string name="live_hint">OK : aperçu  •  OK une 2ᵉ fois : plein écran  •  Appui long : favori</string>
+    <string name="vod_hint">Appui long sur une affiche : favori  •  Appui long sur une catégorie : la masquer</string>
+    <string name="login_title">Connexion à votre abonnement</string>
+    <string name="login_help">Saisissez les informations Xtream fournies par votre fournisseur. Vous pouvez aussi coller un lien M3U complet dans le premier champ.</string>
+    <string name="server_hint">Adresse du serveur (ex : http://exemple.com:8080)</string>
+    <string name="user_hint">Nom d\'utilisateur</string>
+    <string name="pass_hint">Mot de passe</string>
+    <string name="connect">Se connecter</string>
+    <string name="search_hint">Nom d\'une chaîne, d\'un film ou d\'une série…</string>
+    <string name="play">▶  Lire</string>
+    <string name="from_start">⟲  Depuis le début</string>
+</resources>
