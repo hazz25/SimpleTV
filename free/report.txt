@@ -20,6 +20,5 @@ Chaînes : 828
   Arabe · Religion : 66
   Arabe · Autres : 50
   présentes dans les deux sources : 89
-Films du domaine public : 280
-  Arabe · Films du domaine public : 32
-  Français · Films du domaine public : 248
+Films libres de droits : 0
+Internet Archive indisponible : 'response'
