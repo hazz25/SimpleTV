@@ -29,6 +29,7 @@ object M3u {
         var group: String? = null
         var ua: String? = null
         var referrer: String? = null
+        var backups: List<String> = emptyList()
 
         for (raw in lines) {
             val line = raw.trim()
@@ -41,6 +42,7 @@ object M3u {
                     group = attrs["group-title"]?.substringBefore(';')?.trim()?.takeIf { it.isNotEmpty() }
                     ua = attrs["user-agent"] ?: attrs["http-user-agent"]
                     referrer = attrs["http-referrer"] ?: attrs["referrer"]
+                    backups = attrs["backup-urls"]?.split('|')?.map { it.trim() }?.filter { it.startsWith("http") }.orEmpty()
                 }
                 line.startsWith("#EXTGRP:", ignoreCase = true) ->
                     group = line.substringAfter(':').trim().takeIf { it.isNotEmpty() } ?: group
@@ -70,11 +72,12 @@ object M3u {
                                     url = line,
                                     userAgent = ua?.takeIf { it.isNotBlank() },
                                     referrer = referrer?.takeIf { it.isNotBlank() },
+                                    backups = backups,
                                 ),
                             )
                         }
                     }
-                    name = null; logo = null; group = null; ua = null; referrer = null
+                    name = null; logo = null; group = null; ua = null; referrer = null; backups = emptyList()
                 }
             }
         }

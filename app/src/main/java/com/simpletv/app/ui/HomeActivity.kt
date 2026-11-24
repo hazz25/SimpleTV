@@ -91,7 +91,7 @@ class HomeActivity : BaseActivity() {
             try {
                 val info = Repo.userInfo()
                 val details = if (info == null) {
-                    "Liste M3U"
+                    if (list.isFree) "Sans abonnement" else "Liste M3U"
                 } else {
                     val date = info.expDate?.let {
                         "Expire le " + SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(Date(it * 1000))

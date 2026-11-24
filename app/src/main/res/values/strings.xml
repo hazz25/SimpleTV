@@ -18,6 +18,7 @@
     <string name="vod_hint">Appui long sur une affiche : favori  •  Appui long sur une catégorie : la masquer</string>
     <string name="login_title">Ajouter une liste</string>
     <string name="login_help">Saisissez les informations Xtream fournies par votre fournisseur. Vous pouvez aussi coller votre lien complet (get.php?username=…) dans le champ du serveur.</string>
+    <string name="login_help_free">Sans abonnement et sans réglage : des centaines de chaînes françaises et arabes diffusées gratuitement, et des films du domaine public. La liste est mise à jour automatiquement chaque nuit.</string>
     <string name="login_help_m3u">Collez l\'adresse d\'une liste M3U ou M3U8. Elle ne contient que des chaînes en direct.</string>
     <string name="server_hint">Adresse du serveur (ex : http://exemple.com:8080)</string>
     <string name="user_hint">Nom d\'utilisateur</string>

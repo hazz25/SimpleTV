@@ -40,6 +40,11 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tabFree"
+                    style="@style/Btn"
+                    android:text="Gratuit" />
+
+                <TextView
                     android:id="@+id/tabXtream"
                     style="@style/Btn"
                     android:text="Code Xtream" />

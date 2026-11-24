@@ -38,8 +38,16 @@ class PlaylistsActivity : BaseActivity() {
         lists = Prefs.playlists()
         val activeId = Prefs.active?.id
         val rows = lists.map { p ->
-            val kind = if (p.isXtream) "Xtream" else "M3U"
-            val detail = if (p.isXtream) "${p.user}  •  ${p.server}" else p.url
+            val kind = when {
+                p.isXtream -> "Xtream"
+                p.isFree -> "Gratuit"
+                else -> "M3U"
+            }
+            val detail = when {
+                p.isXtream -> "${p.user}  •  ${p.server}"
+                p.isFree -> "Chaînes françaises et arabes, films du domaine public"
+                else -> p.url
+            }
             RowAdapter.Row(
                 title = (if (p.id == activeId) "✓  " else "") + p.name,
                 left = kind,
@@ -48,7 +56,7 @@ class PlaylistsActivity : BaseActivity() {
         }
         adapter.items = rows + RowAdapter.Row(
             title = "＋  Ajouter une liste",
-            sub = "Code Xtream ou lien M3U",
+            sub = "Chaînes gratuites, code Xtream ou lien M3U",
         )
     }
 

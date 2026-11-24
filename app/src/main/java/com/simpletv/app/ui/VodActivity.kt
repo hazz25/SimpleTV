@@ -81,6 +81,11 @@ class VodActivity : BaseActivity() {
                     all = Repo.movies()
                 }
                 byId = all.associateBy { it.id.toString() }
+                if (Repo.freeList && isSeries) {
+                    header.text = "Il n'existe pas de séries gratuites et libres de droits en français ou en arabe. " +
+                        "Retrouvez des séries en direct dans TV en direct → « Films & séries »."
+                    return@launch
+                }
                 if (Repo.liveOnly) {
                     header.text = "Cette liste M3U ne contient que des chaînes en direct. Les films et séries " +
                         "sont disponibles avec un code Xtream (Paramètres → Mes listes)."

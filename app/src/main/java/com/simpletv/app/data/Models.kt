@@ -13,6 +13,7 @@ data class Playlist(
     val url: String = "",
 ) {
     val isXtream: Boolean get() = type == XTREAM
+    val isFree: Boolean get() = type == FREE
     val account: Account get() = Account(server, user, pass)
 
     fun sameSourceAs(o: Playlist): Boolean =
@@ -21,6 +22,12 @@ data class Playlist(
     companion object {
         const val XTREAM = "xtream"
         const val M3U = "m3u"
+        const val FREE = "free"
+
+        /** Built-in free list, rebuilt every night on GitHub (French and Arabic channels, public-domain films). */
+        const val FREE_BASE = "https://raw.githubusercontent.com/hazz25/SimpleTV/main/free"
+
+        fun free(id: String) = Playlist(id = id, name = "Chaînes gratuites", type = FREE, url = FREE_BASE)
 
         fun xtream(id: String, name: String, a: Account) =
             Playlist(id = id, name = name, type = XTREAM, server = a.server, user = a.user, pass = a.pass)
@@ -48,6 +55,8 @@ data class LiveStream(
     val url: String? = null,
     val userAgent: String? = null,
     val referrer: String? = null,
+    /** Other addresses for the same channel, tried when the first one fails. */
+    val backups: List<String> = emptyList(),
 )
 
 /** A film or a series as it appears in a grid. [ext] is the file extension (films only). */

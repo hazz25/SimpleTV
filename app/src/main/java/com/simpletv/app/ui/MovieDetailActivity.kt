@@ -104,7 +104,7 @@ class MovieDetailActivity : BaseActivity() {
     private fun play(fromStart: Boolean) {
         if (fromStart) Prefs.savePosition(key, 0)
         val url = try {
-            Xtream.movieUrl(Repo.account(), id, ext)
+            Repo.movieUrl(id, ext)
         } catch (e: Exception) {
             toast(errorText(e)); return
         }

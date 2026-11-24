@@ -44,7 +44,10 @@ object Streams {
     /** Every way to open a channel: its own address for M3U lists, built from the account for Xtream. */
     fun live(s: LiveStream): List<Attempt> {
         val direct = s.url
-        if (direct != null) return agents(s.userAgent).map { Attempt(direct, it, s.referrer) }
+        if (direct != null) {
+            val urls = listOf(direct) + s.backups
+            return urls.flatMap { u -> agents(s.userAgent).map { Attempt(u, it, s.referrer) } }
+        }
         return live(Repo.account(), s.id)
     }
 

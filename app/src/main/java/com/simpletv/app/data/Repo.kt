@@ -33,14 +33,39 @@ object Repo {
 
     private var m3u: M3u.Result? = null
 
+    private val isFree: Boolean get() = Prefs.active?.isFree == true
+
     private suspend fun m3u(): M3u.Result = withContext(Dispatchers.IO) {
         lock.withLock {
-            m3u ?: M3u.load(Prefs.active?.url ?: throw IOException("Aucune liste configurée")).also { m3u = it }
+            m3u ?: run {
+                val list = Prefs.active ?: throw IOException("Aucune liste configurée")
+                M3u.load(if (list.isFree) "${list.url}/live.m3u" else list.url)
+            }.also { m3u = it }
         }
     }
 
+    /** Public-domain films of the built-in free list. */
+    private var freeFilms: List<FreeFilm>? = null
+
+    private suspend fun freeFilms(): List<FreeFilm> = withContext(Dispatchers.IO) {
+        lock.withLock {
+            freeFilms ?: try {
+                FreeFilm.load("${Prefs.active?.url}/movies.json")
+            } catch (e: Exception) {
+                emptyList()
+            }.also { freeFilms = it }
+        }
+    }
+
+    private fun freeFilm(id: Int): FreeFilm? = freeFilms?.firstOrNull { it.id.hashCode() == id }
+
+    /** Address of a film, from the Xtream account or from the free list. */
+    fun movieUrl(id: Int, ext: String): String =
+        if (isFree) freeFilm(id)?.url ?: throw IOException("Film introuvable") else Xtream.movieUrl(account(), id, ext)
+
     fun clear() {
         m3u = null
+        freeFilms = null
         userInfo = null
         liveCats = null
         live = null
@@ -81,11 +106,18 @@ object Repo {
     }
 
     suspend fun movieCategories(): List<Category> {
+        if (isFree) return freeFilms().map { it.category }.distinct().map { Category(it, it) }
         if (isM3u) return emptyList()
         return cached({ movieCats }, { movieCats = it }) { Xtream.categories(it, "get_vod_categories") }
     }
 
     suspend fun movies(): List<Media> {
+        if (isFree) {
+            val films = freeFilms()
+            return films.mapIndexed { i, f ->
+                Media(f.id.hashCode(), f.title, f.poster, f.category, null, (films.size - i).toLong(), "mp4")
+            }
+        }
         if (isM3u) return emptyList()
         return cached({ movieList }, { movieList = it }) { Xtream.movies(it) }
     }
@@ -101,7 +133,10 @@ object Repo {
     }
 
     /** True when the active list only has live channels. */
-    val liveOnly: Boolean get() = isM3u
+    val liveOnly: Boolean get() = isM3u && !isFree
+
+    /** True for the built-in free list (no series in it). */
+    val freeList: Boolean get() = isFree
 
     suspend fun shortEpg(streamId: Int): List<EpgEntry> = withContext(Dispatchers.IO) {
         if (isM3u) return@withContext emptyList()
@@ -113,7 +148,16 @@ object Repo {
         }
     }
 
-    suspend fun movieInfo(id: Int): MovieInfo = withContext(Dispatchers.IO) { Xtream.movieInfo(account(), id) }
+    suspend fun movieInfo(id: Int): MovieInfo {
+        if (isFree) {
+            val f = freeFilms().firstOrNull { it.id.hashCode() == id } ?: throw IOException("Film introuvable")
+            return MovieInfo(
+                plot = f.plot, genre = "Domaine public", year = f.year, duration = f.duration, rating = "",
+                cast = "", director = "", poster = f.poster, backdrop = null, ext = "mp4",
+            )
+        }
+        return withContext(Dispatchers.IO) { Xtream.movieInfo(account(), id) }
+    }
 
     suspend fun seriesInfo(id: Int): SeriesInfo = withContext(Dispatchers.IO) { Xtream.seriesInfo(account(), id) }
 }

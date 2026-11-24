@@ -46,6 +46,7 @@ class SettingsActivity : BaseActivity() {
 
     private fun accountLine(): String {
         val list = Prefs.active ?: return "Aucune liste"
+        if (list.isFree) return "${list.name}  •  sans abonnement, mise à jour chaque nuit"
         if (!list.isXtream) return "${list.name}  •  liste M3U\n${list.url}"
         val i = info ?: return "${list.name}  •  ${list.user}\n${list.server}"
         val exp = i.expDate?.let { "expire le " + SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(Date(it * 1000)) }
