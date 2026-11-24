@@ -1,0 +1,25 @@
+Chaînes : 828
+  Français · Généralistes : 106
+  Français · Info : 65
+  Français · Sport : 9
+  Français · Films & séries : 50
+  Français · Jeunesse : 23
+  Français · Découverte : 27
+  Français · Divertissement : 50
+  Français · Musique : 40
+  Français · Religion : 39
+  Français · Autres : 45
+  Arabe · Généralistes : 78
+  Arabe · Info : 79
+  Arabe · Sport : 20
+  Arabe · Films & séries : 21
+  Arabe · Jeunesse : 12
+  Arabe · Découverte : 14
+  Arabe · Divertissement : 7
+  Arabe · Musique : 27
+  Arabe · Religion : 66
+  Arabe · Autres : 50
+  présentes dans les deux sources : 89
+Films du domaine public : 280
+  Arabe · Films du domaine public : 32
+  Français · Films du domaine public : 248
