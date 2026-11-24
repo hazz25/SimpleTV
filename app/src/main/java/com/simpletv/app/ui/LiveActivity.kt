@@ -9,11 +9,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +20,6 @@ import com.simpletv.app.data.LiveStream
 import com.simpletv.app.data.PlayItem
 import com.simpletv.app.data.Prefs
 import com.simpletv.app.data.Repo
-import com.simpletv.app.data.Xtream
 import kotlinx.coroutines.launch
 
 /** Live TV in three columns: categories, channels, preview. */
@@ -68,9 +63,7 @@ class LiveActivity : BaseActivity() {
     private var channels: List<LiveStream> = emptyList()
     private var currentCat: String = ALL
 
-    private var player: ExoPlayer? = null
     private var previewing: LiveStream? = null
-    private var triedOtherFormat = false
     private val handler = Handler(Looper.getMainLooper())
     private var pendingCategory: Runnable? = null
 
@@ -247,40 +240,21 @@ class LiveActivity : BaseActivity() {
 
     // ---- Preview ---------------------------------------------------------------------------
 
-    private fun ensurePlayer(): ExoPlayer {
-        player?.let { return it }
-        val p = Players.create(this)
-        p.addListener(object : Player.Listener {
-            override fun onPlayerError(error: PlaybackException) {
-                val s = previewing ?: return
-                if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
-                    p.seekToDefaultPosition()
-                    p.prepare()
-                    return
-                }
-                if (!triedOtherFormat) {
-                    triedOtherFormat = true
-                    val other = if (Prefs.liveFormat == "ts") "m3u8" else "ts"
-                    p.setMediaItem(MediaItem.fromUri(Xtream.liveUrl(Repo.account(), s.id, other)))
-                    p.prepare()
-                    return
-                }
-                previewHint.text = "Chaîne indisponible pour le moment"
-                previewHint.show(true)
+    private val preview by lazy {
+        RetryingPlayer(this, previewView, object : RetryingPlayer.Callback {
+            override fun onReady() {
+                previewHint.show(false)
             }
 
-            override fun onPlaybackStateChanged(state: Int) {
-                if (state == Player.STATE_READY) previewHint.show(false)
+            override fun onFailed(message: String) {
+                previewHint.text = message
+                previewHint.show(true)
             }
         })
-        previewView.player = p
-        player = p
-        return p
     }
 
     private fun startPreview(s: LiveStream) {
         previewing = s
-        triedOtherFormat = false
         Prefs.addRecent("live", s.id.toString())
         chName.text = s.name
         epgNow.text = ""
@@ -288,10 +262,7 @@ class LiveActivity : BaseActivity() {
         previewHint.text = getString(R.string.loading)
         previewHint.show(true)
         try {
-            val p = ensurePlayer()
-            p.setMediaItem(MediaItem.fromUri(Xtream.liveUrl(Repo.account(), s.id, Prefs.liveFormat)))
-            p.prepare()
-            p.playWhenReady = true
+            preview.play(Streams.live(Repo.account(), s.id), isLive = true)
         } catch (e: Exception) {
             previewHint.text = errorText(e)
         }
@@ -310,9 +281,7 @@ class LiveActivity : BaseActivity() {
     }
 
     private fun releasePlayer() {
-        previewView.player = null
-        player?.release()
-        player = null
+        preview.release()
     }
 
     override fun onPause() {

@@ -10,9 +10,6 @@ import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.annotation.OptIn
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -21,7 +18,6 @@ import com.simpletv.app.data.LiveStream
 import com.simpletv.app.data.PlayItem
 import com.simpletv.app.data.Prefs
 import com.simpletv.app.data.Repo
-import com.simpletv.app.data.Xtream
 import kotlinx.coroutines.launch
 
 /**
@@ -37,9 +33,10 @@ class PlayerActivity : BaseActivity() {
     private lateinit var ovEpg: TextView
     private lateinit var errorView: TextView
 
-    private var player: ExoPlayer? = null
+    private lateinit var playback: RetryingPlayer
+    private val player: ExoPlayer? get() = if (::playback.isInitialized) playback.player else null
+    private var active = false
     private var index = 0
-    private var triedOtherFormat = false
     private val handler = Handler(Looper.getMainLooper())
     private val hideOverlay = Runnable { overlay.visibility = View.GONE }
 
@@ -63,6 +60,24 @@ class PlayerActivity : BaseActivity() {
         }
         view.controllerShowTimeoutMs = 4000
         view.setShowSubtitleButton(true)
+        playback = RetryingPlayer(this, view, object : RetryingPlayer.Callback {
+            override fun onReady() {
+                errorView.visibility = View.GONE
+            }
+
+            override fun onEnded() {
+                val item = current
+                if (item is PlayItem.Vod) {
+                    Prefs.savePosition(item.key, -1)
+                    if (index + 1 < items.size) play(index + 1) else finish()
+                }
+            }
+
+            override fun onFailed(message: String) {
+                errorView.text = message + if (isLive) "\n\n▲ ▼ pour changer de chaîne" else ""
+                errorView.visibility = View.VISIBLE
+            }
+        })
 
         onBackPressedDispatcher.addCallback(this) {
             if (!isLive && view.isControllerFullyVisible) view.hideController() else finish()
@@ -73,81 +88,50 @@ class PlayerActivity : BaseActivity() {
     // stream: many subscriptions allow only one connection at a time.
     override fun onResume() {
         super.onResume()
-        if (items.isEmpty() || player != null) return
-        val p = Players.create(this)
-        p.addListener(listener)
-        player = p
-        view.player = p
+        if (items.isEmpty() || active) return
+        active = true
         play(index)
     }
 
     override fun onPause() {
         super.onPause()
+        if (!active) return
         savePosition()
-        view.player = null
-        player?.release()
-        player = null
+        playback.release()
+        active = false
         handler.removeCallbacks(hideOverlay)
     }
 
-    private val listener = object : Player.Listener {
-        override fun onPlayerError(error: PlaybackException) {
-            val p = player ?: return
-            if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
-                p.seekToDefaultPosition()
-                p.prepare()
-                return
-            }
-            val item = current
-            if (item is PlayItem.Live && !triedOtherFormat) {
-                // Some servers only deliver one of the two formats: try the other one once.
-                triedOtherFormat = true
-                val other = if (Prefs.liveFormat == "ts") "m3u8" else "ts"
-                p.setMediaItem(MediaItem.fromUri(Xtream.liveUrl(Repo.account(), item.stream.id, other)))
-                p.prepare()
-                return
-            }
-            errorView.text = "Lecture impossible\n(${error.errorCodeName})" +
-                if (item is PlayItem.Live) "\n\n▲ ▼ pour changer de chaîne" else ""
-            errorView.visibility = View.VISIBLE
-        }
-
-        override fun onPlaybackStateChanged(state: Int) {
-            if (state == Player.STATE_READY) errorView.visibility = View.GONE
-            if (state == Player.STATE_ENDED) {
-                val item = current
-                if (item is PlayItem.Vod) {
-                    Prefs.savePosition(item.key, -1)
-                    if (index + 1 < items.size) play(index + 1) else finish()
-                }
-            }
-        }
-    }
-
     private fun play(i: Int) {
-        val p = player ?: return
         index = i
         Repo.queueIndex = i
-        triedOtherFormat = false
         errorView.visibility = View.GONE
+        val account = try {
+            Repo.account()
+        } catch (e: Exception) {
+            onError(errorText(e)); return
+        }
         when (val item = current ?: return) {
             is PlayItem.Live -> {
                 view.useController = false
                 Repo.lastLivePlayed = item.stream
                 Prefs.addRecent("live", item.stream.id.toString())
-                p.setMediaItem(MediaItem.fromUri(Xtream.liveUrl(Repo.account(), item.stream.id, Prefs.liveFormat)))
+                playback.play(Streams.live(account, item.stream.id), isLive = true)
                 showLiveInfo(item.stream)
             }
             is PlayItem.Vod -> {
                 view.useController = true
                 val start = Prefs.position(item.key).coerceAtLeast(0)
-                p.setMediaItem(MediaItem.fromUri(item.url), start)
+                playback.play(Streams.vod(item.url), isLive = false, startPositionMs = start)
                 showTitle(item.title, if (start > 0) "Reprise à ${formatDuration(start)}" else "")
             }
         }
-        p.prepare()
-        p.playWhenReady = true
         view.requestFocus()
+    }
+
+    private fun onError(message: String) {
+        errorView.text = message
+        errorView.visibility = View.VISIBLE
     }
 
     private fun savePosition() {

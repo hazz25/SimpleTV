@@ -34,6 +34,11 @@ object Prefs {
         get() = sp.getString("liveFormat", "ts") ?: "ts"
         set(v) = sp.edit().putString("liveFormat", v).apply()
 
+    /** The player name the server last accepted. */
+    var userAgent: String?
+        get() = sp.getString("userAgent", null)
+        set(v) = sp.edit().putString("userAgent", v).apply()
+
     var invertZap: Boolean
         get() = sp.getBoolean("invertZap", false)
         set(v) = sp.edit().putBoolean("invertZap", v).apply()
