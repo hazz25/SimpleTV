@@ -3,7 +3,6 @@ package com.simpletv.app.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,18 +45,19 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun accountLine(): String {
-        val a = Prefs.account ?: return "Aucun compte"
-        val i = info ?: return "${a.user}  •  ${a.server}"
+        val list = Prefs.active ?: return "Aucune liste"
+        if (!list.isXtream) return "${list.name}  •  liste M3U\n${list.url}"
+        val i = info ?: return "${list.name}  •  ${list.user}\n${list.server}"
         val exp = i.expDate?.let { "expire le " + SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(Date(it * 1000)) }
             ?: "sans date d'expiration"
         val screens = if (i.maxConnections.isNotEmpty()) "  •  ${i.maxConnections} écran(s) max" else ""
-        return "${a.user}  •  $exp$screens\n${a.server}"
+        return "${list.name}  •  ${list.user}  •  $exp$screens\n${list.server}"
     }
 
     private fun refresh() {
         val hidden = Prefs.hiddenCount()
         items = listOf(
-            Item("Compte", accountLine(), null),
+            Item("Liste utilisée", accountLine()) { startActivity(Intent(this, PlaylistsActivity::class.java)) },
             Item(
                 "Format des chaînes en direct",
                 if (Prefs.liveFormat == "ts") "TS (recommandé). Changez si les chaînes ne se lancent pas."
@@ -97,7 +97,9 @@ class SettingsActivity : BaseActivity() {
                     refresh()
                 }
             },
-            Item("Changer de compte", "Se connecter avec un autre code Xtream") { confirmLogout() },
+            Item("Mes listes", "Changer de liste, en ajouter une (Xtream ou M3U) ou en supprimer") {
+                startActivity(Intent(this, PlaylistsActivity::class.java))
+            },
             Item("Mises à jour", updateLine()) { onUpdateClick() },
         )
         adapter.items = items.map { RowAdapter.Row(title = it.title, sub = it.value) }
@@ -138,20 +140,5 @@ class SettingsActivity : BaseActivity() {
 
     private fun onItemClick(position: Int) {
         items.getOrNull(position)?.action?.invoke()
-    }
-
-    private fun confirmLogout() {
-        AlertDialog.Builder(this)
-            .setTitle("Changer de compte ?")
-            .setMessage("Vos favoris et votre historique sont conservés sur cette TV.")
-            .setPositiveButton("Oui") { _, _ ->
-                Repo.clear()
-                startActivity(
-                    Intent(this, LoginActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
-                )
-            }
-            .setNegativeButton("Annuler", null)
-            .show()
     }
 }

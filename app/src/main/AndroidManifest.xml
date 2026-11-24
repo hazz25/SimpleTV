@@ -38,6 +38,7 @@
         <activity android:name=".ui.SeriesDetailActivity" android:screenOrientation="sensorLandscape" />
         <activity android:name=".ui.SearchActivity" android:theme="@style/AppTheme.Typing" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.SettingsActivity" android:screenOrientation="sensorLandscape" />
+        <activity android:name=".ui.PlaylistsActivity" android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".ui.PlayerActivity"
             android:screenOrientation="sensorLandscape"

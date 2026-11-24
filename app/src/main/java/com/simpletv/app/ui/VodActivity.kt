@@ -81,6 +81,11 @@ class VodActivity : BaseActivity() {
                     all = Repo.movies()
                 }
                 byId = all.associateBy { it.id.toString() }
+                if (Repo.liveOnly) {
+                    header.text = "Cette liste M3U ne contient que des chaînes en direct. Les films et séries " +
+                        "sont disponibles avec un code Xtream (Paramètres → Mes listes)."
+                    return@launch
+                }
                 buildCategories()
                 showCategory(if (Prefs.recents(type).any { it in byId }) RECENT else ALL)
                 focusCategory()

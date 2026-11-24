@@ -23,7 +23,7 @@ class HomeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (Prefs.account == null) {
+        if (Prefs.active == null) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
@@ -41,7 +41,7 @@ class HomeActivity : BaseActivity() {
             startActivity(Intent(this, LiveActivity::class.java).putExtra(LiveActivity.EXTRA_CATEGORY, LiveActivity.FAV))
         }
         click(R.id.btnSettings) { startActivity(Intent(this, SettingsActivity::class.java)) }
-        click(R.id.btnReload) { reload() }
+        click(R.id.btnReload) { startActivity(Intent(this, PlaylistsActivity::class.java)) }
         click(R.id.btnExit) { finishAffinity() }
 
         findViewById<View>(R.id.tileLive).requestFocus()
@@ -85,15 +85,21 @@ class HomeActivity : BaseActivity() {
     }
 
     private fun loadAccount() {
+        val list = Prefs.active ?: return
         expiry.text = getString(R.string.loading)
         lifecycleScope.launch {
             try {
                 val info = Repo.userInfo()
-                val date = info.expDate?.let {
-                    "Expire le " + SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(Date(it * 1000))
-                } ?: "Abonnement sans date d'expiration"
-                val state = if (info.status.isNotEmpty() && !info.status.equals("Active", true)) "  •  ${info.status}" else ""
-                expiry.text = date + state
+                val details = if (info == null) {
+                    "Liste M3U"
+                } else {
+                    val date = info.expDate?.let {
+                        "Expire le " + SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(Date(it * 1000))
+                    } ?: "Sans date d'expiration"
+                    val state = if (info.status.isNotEmpty() && !info.status.equals("Active", true)) "  •  ${info.status}" else ""
+                    date + state
+                }
+                expiry.text = "${list.name}\n$details"
                 status.text = ""
                 // Warm up the channel list so "TV en direct" opens instantly.
                 try {
@@ -103,15 +109,9 @@ class HomeActivity : BaseActivity() {
                     // The live screen shows its own error.
                 }
             } catch (e: Exception) {
-                expiry.text = ""
+                expiry.text = list.name
                 status.text = "Connexion impossible : ${errorText(e)}"
             }
         }
-    }
-
-    private fun reload() {
-        Repo.clear()
-        toast("Mise à jour des listes…")
-        loadAccount()
     }
 }

@@ -108,17 +108,16 @@ class PlayerActivity : BaseActivity() {
         index = i
         Repo.queueIndex = i
         errorView.visibility = View.GONE
-        val account = try {
-            Repo.account()
-        } catch (e: Exception) {
-            onError(errorText(e)); return
-        }
         when (val item = current ?: return) {
             is PlayItem.Live -> {
                 view.useController = false
                 Repo.lastLivePlayed = item.stream
                 Prefs.addRecent("live", item.stream.id.toString())
-                playback.play(Streams.live(account, item.stream.id), isLive = true)
+                try {
+                    playback.play(Streams.live(item.stream), isLive = true)
+                } catch (e: Exception) {
+                    onError(errorText(e))
+                }
                 showLiveInfo(item.stream)
             }
             is PlayItem.Vod -> {

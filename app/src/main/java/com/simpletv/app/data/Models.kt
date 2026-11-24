@@ -2,6 +2,33 @@ package com.simpletv.app.data
 
 data class Account(val server: String, val user: String, val pass: String)
 
+/** A saved source of channels: an Xtream account or an M3U playlist address. */
+data class Playlist(
+    val id: String,
+    val name: String,
+    val type: String,
+    val server: String = "",
+    val user: String = "",
+    val pass: String = "",
+    val url: String = "",
+) {
+    val isXtream: Boolean get() = type == XTREAM
+    val account: Account get() = Account(server, user, pass)
+
+    fun sameSourceAs(o: Playlist): Boolean =
+        type == o.type && (if (isXtream) server == o.server && user == o.user else url == o.url)
+
+    companion object {
+        const val XTREAM = "xtream"
+        const val M3U = "m3u"
+
+        fun xtream(id: String, name: String, a: Account) =
+            Playlist(id = id, name = name, type = XTREAM, server = a.server, user = a.user, pass = a.pass)
+
+        fun m3u(id: String, name: String, url: String) = Playlist(id = id, name = name, type = M3U, url = url)
+    }
+}
+
 data class UserInfo(
     val status: String,
     val expDate: Long?,
@@ -17,6 +44,10 @@ data class LiveStream(
     val name: String,
     val icon: String?,
     val categoryId: String,
+    /** M3U lists give the stream address directly (Xtream builds it from the account). */
+    val url: String? = null,
+    val userAgent: String? = null,
+    val referrer: String? = null,
 )
 
 /** A film or a series as it appears in a grid. [ext] is the file extension (films only). */

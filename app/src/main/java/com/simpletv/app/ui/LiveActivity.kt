@@ -252,7 +252,7 @@ class LiveActivity : BaseActivity() {
         previewHint.text = getString(R.string.loading)
         previewHint.show(true)
         try {
-            preview.play(Streams.live(Repo.account(), s.id), isLive = true)
+            preview.play(Streams.live(s), isLive = true)
         } catch (e: Exception) {
             previewHint.text = errorText(e)
         }

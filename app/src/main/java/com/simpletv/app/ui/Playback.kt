@@ -18,11 +18,13 @@ import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.ts.DefaultTsPayloadReaderFactory
 import androidx.media3.ui.PlayerView
 import com.simpletv.app.data.Account
+import com.simpletv.app.data.LiveStream
 import com.simpletv.app.data.Prefs
+import com.simpletv.app.data.Repo
 import com.simpletv.app.data.Xtream
 
 /** One way of asking the server for a stream: an address and the player name sent with it. */
-data class Attempt(val url: String, val userAgent: String)
+data class Attempt(val url: String, val userAgent: String, val referrer: String? = null)
 
 /**
  * IPTV servers differ: some refuse the TS format, some only answer known players, and most
@@ -33,10 +35,17 @@ object Streams {
     private const val VLC = "VLC/3.0.21 LibVLC/3.0.21"
     private const val OKHTTP = "okhttp/4.12.0"
 
-    private fun agents(): List<String> {
+    private fun agents(first: String? = null): List<String> {
         val all = listOf(Xtream.UA, VLC, OKHTTP)
-        val preferred = Prefs.userAgent
-        return if (preferred != null && preferred in all) listOf(preferred) + (all - preferred) else all
+        val preferred = first ?: Prefs.userAgent
+        return if (preferred != null) listOf(preferred) + (all - preferred) else all
+    }
+
+    /** Every way to open a channel: its own address for M3U lists, built from the account for Xtream. */
+    fun live(s: LiveStream): List<Attempt> {
+        val direct = s.url
+        if (direct != null) return agents(s.userAgent).map { Attempt(direct, it, s.referrer) }
+        return live(Repo.account(), s.id)
     }
 
     fun live(a: Account, id: Int): List<Attempt> {
@@ -56,9 +65,10 @@ object Streams {
 /** Builds players tuned for IPTV streams. */
 @OptIn(UnstableApi::class)
 object Players {
-    fun create(ctx: Context, userAgent: String): ExoPlayer {
+    fun create(ctx: Context, userAgent: String, referrer: String? = null): ExoPlayer {
         val http = DefaultHttpDataSource.Factory()
             .setUserAgent(userAgent)
+            .setDefaultRequestProperties(if (referrer != null) mapOf("Referer" to referrer) else emptyMap())
             .setAllowCrossProtocolRedirects(true)
             .setConnectTimeoutMs(15_000)
             .setReadTimeoutMs(30_000)
@@ -100,7 +110,7 @@ class RetryingPlayer(
     private var startMs = 0L
     private var live = false
     private var waitedOnce = false
-    private var currentAgent: String? = null
+    private var currentAgent: Attempt? = null
 
     fun play(list: List<Attempt>, isLive: Boolean, startPositionMs: Long = 0L) {
         handler.removeCallbacksAndMessages(null)
@@ -114,18 +124,19 @@ class RetryingPlayer(
 
     private fun load() {
         val a = attempts.getOrNull(step) ?: return
-        val p = playerFor(a.userAgent)
+        val p = playerFor(a)
         val item = MediaItem.fromUri(a.url)
         if (!live && startMs > 0) p.setMediaItem(item, startMs) else p.setMediaItem(item)
         p.prepare()
         p.playWhenReady = true
     }
 
-    private fun playerFor(agent: String): ExoPlayer {
+    private fun playerFor(a: Attempt): ExoPlayer {
         val existing = player
-        if (existing != null && agent == currentAgent) return existing
+        val same = currentAgent?.let { it.userAgent == a.userAgent && it.referrer == a.referrer } == true
+        if (existing != null && same) return existing
         existing?.release()
-        val p = Players.create(ctx, agent)
+        val p = Players.create(ctx, a.userAgent, a.referrer)
         p.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) = handleError(p, error)
 
@@ -139,13 +150,13 @@ class RetryingPlayer(
         })
         view.player = p
         player = p
-        currentAgent = agent
+        currentAgent = a
         return p
     }
 
     private fun remember() {
         val a = attempts.getOrNull(step) ?: return
-        Prefs.userAgent = a.userAgent
+        if (!live || Prefs.account != null) Prefs.userAgent = a.userAgent
         if (live) {
             when {
                 a.url.endsWith(".ts") -> Prefs.liveFormat = "ts"

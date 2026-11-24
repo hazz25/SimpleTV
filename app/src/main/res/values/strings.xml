@@ -10,13 +10,15 @@
     <string name="search">Rechercher</string>
     <string name="settings">Paramètres</string>
     <string name="reload">Recharger</string>
+    <string name="my_lists">Mes listes</string>
     <string name="exit">Quitter</string>
     <string name="loading">Chargement…</string>
     <string name="pick_channel">Choisissez une chaîne</string>
     <string name="live_hint">OK : aperçu  •  OK une 2ᵉ fois : plein écran  •  Appui long : favori</string>
     <string name="vod_hint">Appui long sur une affiche : favori  •  Appui long sur une catégorie : la masquer</string>
-    <string name="login_title">Connexion à votre abonnement</string>
-    <string name="login_help">Saisissez les informations Xtream fournies par votre fournisseur. Vous pouvez aussi coller un lien M3U complet dans le premier champ.</string>
+    <string name="login_title">Ajouter une liste</string>
+    <string name="login_help">Saisissez les informations Xtream fournies par votre fournisseur. Vous pouvez aussi coller votre lien complet (get.php?username=…) dans le champ du serveur.</string>
+    <string name="login_help_m3u">Collez l\'adresse d\'une liste M3U ou M3U8. Elle ne contient que des chaînes en direct.</string>
     <string name="server_hint">Adresse du serveur (ex : http://exemple.com:8080)</string>
     <string name="user_hint">Nom d\'utilisateur</string>
     <string name="pass_hint">Mot de passe</string>

@@ -155,9 +155,9 @@
                 android:layout_height="70dp"
                 android:layout_marginTop="13dp">
 
-                <TextView style="@style/TileIcon" android:textSize="26sp" android:text="🔄" />
+                <TextView style="@style/TileIcon" android:textSize="26sp" android:text="📋" />
 
-                <TextView style="@style/SideLabel" android:text="@string/reload" />
+                <TextView style="@style/SideLabel" android:text="@string/my_lists" />
             </LinearLayout>
 
             <LinearLayout
