@@ -23,7 +23,7 @@ function createWindow() {
     minHeight: 600,
     backgroundColor: '#0B1020',
     title: 'Simple TV',
-    icon: path.join(__dirname, 'build', 'icon.png'),
+    icon: path.join(__dirname, 'assets', 'icon.png'),
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

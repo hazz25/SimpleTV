@@ -25,11 +25,12 @@
       "main.js",
       "preload.js",
       "src/**",
-      "build/icon.png",
+      "assets/icon.png",
       "package.json"
     ],
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "assets"
     },
     "win": {
       "target": [
@@ -40,7 +41,7 @@
           ]
         }
       ],
-      "icon": "build/icon.ico"
+      "icon": "assets/icon.ico"
     },
     "nsis": {
       "oneClick": true,
@@ -52,8 +53,8 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Simple TV",
       "deleteAppDataOnUninstall": false,
-      "installerIcon": "build/icon.ico",
-      "uninstallerIcon": "build/icon.ico"
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
     }
   }
 }
