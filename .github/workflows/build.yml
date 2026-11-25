@@ -8,6 +8,8 @@ on:
       - "tools/**"
       - ".github/workflows/free-lists.yml"
       - "README.md"
+      - "desktop/**"
+      - ".github/workflows/desktop.yml"
   workflow_dispatch:
 
 permissions:
