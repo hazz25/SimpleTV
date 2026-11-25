@@ -909,6 +909,8 @@ https://5dd226f8f01e8.streamlock.net/via-matele-live/matelelive_1080/playlist.m3
 https://vosgestv.live-kd.com/live/vosgestv/vosgestv/playlist.m3u8
 #EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://i.imgur.com/PJYTfHi.png",2M
 http://185.9.2.18/chid_218/index.m3u8
+#EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://raw.githubusercontent.com/songwenhui239/Songwenhui239/refs/heads/main/3.16%20Channel.jpeg",3.16 Channel
+https://316hls.wns.live/hls/stream.m3u8
 #EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://i.imgur.com/7cNke07.png",Abu Dhabi TV
 http://admdn2.cdn.mangomolo.com/adtv/smil:adtv.stream.smil/chunklist.m3u8
 #EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://i.imgur.com/t7CaTu3.png",Afaq TV

@@ -1,4 +1,4 @@
-Chaînes : 828
+Chaînes : 829
   Français · Généralistes : 106
   Français · Info : 65
   Français · Sport : 9
@@ -9,7 +9,7 @@ Chaînes : 828
   Français · Musique : 40
   Français · Religion : 39
   Français · Autres : 45
-  Arabe · Généralistes : 78
+  Arabe · Généralistes : 79
   Arabe · Info : 79
   Arabe · Sport : 20
   Arabe · Films & séries : 21
