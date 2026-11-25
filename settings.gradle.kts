@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "SimpleTV"
 include(":app")
+include(":englishapp")

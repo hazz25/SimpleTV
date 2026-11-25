@@ -10,6 +10,9 @@ on:
       - "README.md"
       - "desktop/**"
       - ".github/workflows/desktop.yml"
+      - "english/**"
+      - "englishapp/**"
+      - ".github/workflows/english.yml"
   workflow_dispatch:
 
 permissions:
