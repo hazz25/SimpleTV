@@ -4,10 +4,6 @@
 
 Code Downloader : **8977165** (télécharge directement la dernière version)
 
-## 🇬🇧 [Next Stop: London, apprendre l'anglais en jouant](https://hazz25.github.io/SimpleTV/english/)
-
-Sur téléphone et PC dans le navigateur, ou [en app Android](https://github.com/hazz25/SimpleTV/releases/download/english/NextStopLondon.apk).
-
 ## 💻 [Télécharger Simple TV pour Windows (.exe)](https://github.com/hazz25/SimpleTV/releases/download/desktop/SimpleTV-Setup.exe)
 
 Windows 10 et 11 : ouvrez le fichier, l'installation prend quelques secondes (sans droits administrateur). Au premier lancement, Windows peut afficher
