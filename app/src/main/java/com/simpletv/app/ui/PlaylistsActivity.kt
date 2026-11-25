@@ -57,10 +57,17 @@ class PlaylistsActivity : BaseActivity() {
         adapter.items = rows + RowAdapter.Row(
             title = "＋  Ajouter une liste",
             sub = "Chaînes gratuites, code Xtream ou lien M3U",
+        ) + RowAdapter.Row(
+            title = "📱  Ajouter depuis mon téléphone",
+            sub = "Scannez un QR code et saisissez la liste sur le téléphone",
         )
     }
 
     private fun onClick(position: Int) {
+        if (position == lists.size + 1) {
+            startActivity(Intent(this, RemoteSetupActivity::class.java))
+            return
+        }
         val p = lists.getOrNull(position)
         if (p == null) {
             startActivity(Intent(this, LoginActivity::class.java).putExtra(LoginActivity.EXTRA_ADDING, true))

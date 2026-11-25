@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple TV — Configurer la TV</title>
+<style>
+  :root { --accent: #3d7bff; --gold: #ffc94d; --dim: #a9b4c8; --item: rgba(255,255,255,.12); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: #fff; font: 16px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #0b1020, #2a1240); padding: 20px;
+  }
+  main { max-width: 480px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 6px 0 2px; }
+  .sub { color: var(--dim); margin-bottom: 18px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .tabs button {
+    flex: 1; padding: 12px 6px; border-radius: 12px; border: 2px solid transparent; background: var(--item);
+    color: #fff; font: inherit; font-weight: 700;
+  }
+  .tabs button.on { border-color: var(--accent); color: var(--gold); }
+  .help { color: var(--dim); font-size: 14px; margin: 6px 0 4px; }
+  input {
+    width: 100%; margin-top: 10px; padding: 14px; border-radius: 10px; border: 2px solid transparent;
+    background: var(--item); color: #fff; font: inherit; outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--dim); }
+  .go {
+    width: 100%; margin-top: 18px; padding: 15px; border: 0; border-radius: 12px; background: var(--accent);
+    color: #fff; font: inherit; font-size: 18px; font-weight: 700;
+  }
+  .go:disabled { opacity: .6; }
+  .msg { margin-top: 16px; text-align: center; min-height: 1.4em; white-space: pre-line; }
+  .msg.ok { color: #7dffa1; font-size: 20px; font-weight: 700; }
+  .msg.err { color: var(--gold); }
+  .hidden { display: none; }
+  .note { color: var(--dim); font-size: 13px; margin-top: 22px; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Simple TV</h1>
+  <div class="sub">Configurez votre TV depuis ce téléphone</div>
+
+  <div class="tabs">
+    <button type="button" data-mode="xtream">Code Xtream</button>
+    <button type="button" data-mode="m3u">Lien M3U</button>
+    <button type="button" data-mode="free">Gratuit</button>
+  </div>
+
+  <form id="f" autocomplete="off">
+    <div class="help" id="help"></div>
+    <input name="name" id="name" placeholder="Nom de la liste (facultatif)">
+    <input name="server" id="server" placeholder="Adresse du serveur (ex : http://exemple.com:8080)" inputmode="url" autocapitalize="off" autocorrect="off">
+    <input name="user" id="user" placeholder="Nom d'utilisateur" autocapitalize="off" autocorrect="off">
+    <input name="pass" id="pass" placeholder="Mot de passe" autocapitalize="off" autocorrect="off">
+    <input name="url" id="url" placeholder="Adresse de la liste (http://…/liste.m3u)" inputmode="url" autocapitalize="off" autocorrect="off">
+    <button class="go" id="go" type="submit">Envoyer à la TV</button>
+  </form>
+  <div class="msg" id="msg"></div>
+  <div class="note">Vos informations vont directement du téléphone à la TV par votre Wi‑Fi.<br>Elles ne passent par aucun site Internet.</div>
+</main>
+<script>
+  var token = "__TOKEN__";
+  var mode = "xtream";
+  var HELP = {
+    xtream: "Saisissez les informations fournies par votre fournisseur. Vous pouvez aussi coller votre lien complet (get.php?username=…) dans le champ du serveur.",
+    m3u: "Collez l'adresse d'une liste M3U ou M3U8. Elle ne contient que des chaînes en direct.",
+    free: "Sans abonnement : des centaines de chaînes françaises et arabes gratuites et des films libres de droits."
+  };
+  function $(id) { return document.getElementById(id); }
+  function show(el, on) { el.classList.toggle("hidden", !on); }
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll(".tabs button").forEach(function (b) { b.classList.toggle("on", b.dataset.mode === m); });
+    $("help").textContent = HELP[m];
+    show($("name"), m !== "free");
+    ["server", "user", "pass"].forEach(function (id) { show($(id), m === "xtream"); });
+    show($("url"), m === "m3u");
+    $("go").textContent = m === "free" ? "Activer les chaînes gratuites" : "Envoyer à la TV";
+    $("msg").textContent = "";
+    $("msg").className = "msg";
+  }
+  document.querySelectorAll(".tabs button").forEach(function (b) {
+    b.addEventListener("click", function () { setMode(b.dataset.mode); });
+  });
+  // A pasted full link fills in the three fields.
+  $("server").addEventListener("change", function () {
+    var v = $("server").value.trim();
+    var m = /username=([^&]+)/i.exec(v), p = /password=([^&]+)/i.exec(v);
+    if (m && p) {
+      $("user").value = decodeURIComponent(m[1]);
+      $("pass").value = decodeURIComponent(p[1]);
+      $("server").value = v.split("?")[0].replace(/\/(get|player_api)\.php$/i, "");
+    }
+  });
+  $("f").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var data = new URLSearchParams();
+    data.set("type", mode);
+    ["name", "server", "user", "pass", "url"].forEach(function (id) { data.set(id, $(id).value.trim()); });
+    var go = $("go"), msg = $("msg");
+    go.disabled = true;
+    msg.className = "msg";
+    msg.textContent = "Vérification par la TV…";
+    fetch("/add?t=" + encodeURIComponent(token), {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: data.toString()
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res.ok) {
+        msg.className = "msg ok";
+        msg.textContent = "✓ C'est fait !\nLa liste « " + res.name + " » est installée sur la TV.";
+        document.getElementById("f").classList.add("hidden");
+        document.querySelector(".tabs").classList.add("hidden");
+      } else {
+        msg.className = "msg err";
+        msg.textContent = res.error;
+      }
+    }).catch(function () {
+      msg.className = "msg err";
+      msg.textContent = "La TV ne répond plus. Vérifiez que l'écran du QR code est toujours ouvert sur la TV.";
+    }).then(function () { go.disabled = false; });
+  });
+  setMode("xtream");
+</script>
+</body>
+</html>

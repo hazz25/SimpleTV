@@ -60,6 +60,9 @@ class LoginActivity : BaseActivity() {
         error = findViewById(R.id.error)
         progress = findViewById(R.id.progress)
 
+        findViewById<TextView>(R.id.fromPhone).setOnClickListener {
+            startActivity(Intent(this, RemoteSetupActivity::class.java))
+        }
         tabFree.setOnClickListener { setMode(Mode.FREE) }
         tabXtream.setOnClickListener { setMode(Mode.XTREAM) }
         tabM3u.setOnClickListener { setMode(Mode.M3U) }

@@ -56,6 +56,13 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/fromPhone"
+                style="@style/Btn"
+                android:layout_marginTop="10dp"
+                android:text="📱  Saisir depuis mon téléphone (QR code)"
+                android:textColor="@color/gold" />
+
+            <TextView
                 android:id="@+id/help"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:padding="36dp">
+
+    <FrameLayout
+        android:layout_width="290dp"
+        android:layout_height="290dp"
+        android:background="#FFFFFF"
+        android:padding="14dp">
+
+        <ImageView
+            android:id="@+id/qr"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📱  Configurer avec votre téléphone"
+            android:textColor="@color/text"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:lineSpacingExtra="6dp"
+            android:text="1.  Connectez le téléphone au même Wi‑Fi que la TV.\n2.  Scannez ce QR code avec l'appareil photo.\n3.  Saisissez votre liste sur le téléphone et validez."
+            android:textColor="@color/text"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Pas d'appareil photo ? Tapez cette adresse dans le navigateur du téléphone :"
+            android:textColor="@color/text_dim"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/gold"
+            android:textIsSelectable="false"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="En attente du téléphone…"
+            android:textColor="@color/text_dim"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/back"
+            style="@style/Btn"
+            android:layout_marginTop="22dp"
+            android:text="←  Retour" />
+    </LinearLayout>
+</LinearLayout>
