@@ -1,0 +1,47 @@
+{
+  "name": "simpletv-desktop",
+  "productName": "Simple TV",
+  "version": "1.0.0",
+  "description": "Lecteur IPTV simple pour Windows (Xtream, M3U, chaînes gratuites)",
+  "main": "main.js",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable --publish never"
+  },
+  "dependencies": {
+    "hls.js": "1.7.4",
+    "mpegts.js": "1.8.2"
+  },
+  "devDependencies": {
+    "electron": "45.5.0",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.simpletv.desktop",
+    "productName": "Simple TV",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**",
+      "build/icon.png",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "portable": {
+      "artifactName": "SimpleTV.exe"
+    }
+  }
+}
