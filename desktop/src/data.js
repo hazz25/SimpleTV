@@ -130,11 +130,12 @@ const Prefs = {
   },
 
   // Shared by all lists.
+  // On a PC, HLS plays more smoothly than raw TS: try it first, TS remains the fallback.
   get liveFormat() {
-    return Store.get('liveFormat', 'ts');
+    return Store.get('liveFormatPc', 'm3u8');
   },
   set liveFormat(v) {
-    Store.set('liveFormat', v);
+    Store.set('liveFormatPc', v);
   },
   get userAgent() {
     return Store.get('userAgent', null);
@@ -539,7 +540,7 @@ const Updater = {
   latest: null,
   checked: false,
   pageUrl: 'https://github.com/hazz25/SimpleTV/releases/tag/desktop',
-  downloadUrl: 'https://github.com/hazz25/SimpleTV/releases/download/desktop/SimpleTV.exe',
+  downloadUrl: 'https://github.com/hazz25/SimpleTV/releases/download/desktop/SimpleTV-Setup.exe',
   async check() {
     const rel = await getJson('https://api.github.com/repos/hazz25/SimpleTV/releases/tags/desktop');
     const m = /Version\s+(\d+\.\d+\.\d+)/i.exec((rel && rel.body) || '');

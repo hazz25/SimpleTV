@@ -4,9 +4,9 @@
 
 Code Downloader : **8977165** (télécharge directement la dernière version)
 
-## 💻 [Télécharger Simple TV pour Windows (.exe)](https://github.com/hazz25/SimpleTV/releases/download/desktop/SimpleTV.exe)
+## 💻 [Télécharger Simple TV pour Windows (.exe)](https://github.com/hazz25/SimpleTV/releases/download/desktop/SimpleTV-Setup.exe)
 
-Windows 10 et 11, rien à installer : ouvrez le fichier. Au premier lancement, Windows peut afficher
+Windows 10 et 11 : ouvrez le fichier, l'installation prend quelques secondes (sans droits administrateur). Au premier lancement, Windows peut afficher
 « Windows a protégé votre ordinateur » : cliquez sur **Informations complémentaires**, puis **Exécuter quand même**.
 
 Lecteur IPTV simple pour Android TV, Google TV, Fire TV et box Android, avec un code Xtream.

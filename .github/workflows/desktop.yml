@@ -1,6 +1,7 @@
 name: Build Windows app
 
-# Builds SimpleTV.exe (portable: nothing to install) and publishes it in the "desktop" release.
+# Builds SimpleTV-Setup.exe (installs in a few seconds, no administrator rights) and publishes it
+# in the "desktop" release.
 # That release is never marked "latest", so the Android download link keeps pointing at the APK.
 on:
   push:
@@ -38,7 +39,7 @@ jobs:
       - name: Build
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
-        run: npx electron-builder --win portable --publish never
+        run: npx electron-builder --win nsis --publish never
 
       - name: Check the package
         run: |
@@ -51,7 +52,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: SimpleTV-Windows
-          path: desktop/dist/SimpleTV.exe
+          path: desktop/dist/SimpleTV-Setup.exe
 
       - name: Publish
         env:
@@ -59,10 +60,11 @@ jobs:
         run: |
           NOTES="Version 1.0.${{ github.run_number }}
 
-          Simple TV pour Windows 10 et 11 : téléchargez SimpleTV.exe et ouvrez-le, rien à installer."
+          Simple TV pour Windows 10 et 11 : téléchargez SimpleTV-Setup.exe et ouvrez-le. L'installation prend quelques secondes, sans droits administrateur, et vos listes sont conservées lors des mises à jour."
           if gh release view desktop > /dev/null 2>&1; then
             gh release edit desktop --notes "$NOTES" --title "Simple TV pour Windows"
           else
             gh release create desktop --title "Simple TV pour Windows" --notes "$NOTES" --latest=false --prerelease
           fi
-          gh release upload desktop dist/SimpleTV.exe --clobber
+          gh release upload desktop dist/SimpleTV-Setup.exe --clobber
+          gh release delete-asset desktop SimpleTV.exe --yes 2>/dev/null || true

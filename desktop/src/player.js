@@ -1,4 +1,5 @@
 // Plays a stream in a <video>, trying each way to open it until one works (same rules as Android).
+// Once a stream plays, small hiccups are repaired in place instead of restarting it.
 'use strict';
 
 class RetryingPlayer {
@@ -18,7 +19,7 @@ class RetryingPlayer {
     this.start = start;
     this.step = 0;
     this.waited = false;
-    this.lastKind = null;
+    this.repairs = [];
     this.load();
   }
 
@@ -31,12 +32,25 @@ class RetryingPlayer {
     this.teardown();
     const a = this.current();
     if (!a) return;
+    this.started = false;
+    this.httpCode = null;
     await window.stv.setHeaders({ ua: a.ua, referer: a.referer || null });
     if (token !== this.token) return;
     const url = a.url;
     const v = this.video;
+
     // Listeners belong to this attempt only, so a late event from the previous one is ignored.
-    const onPlaying = () => token === this.token && this.ready();
+    const onPlaying = () => {
+      if (token !== this.token) return;
+      clearTimeout(this.stallTimer);
+      if (!this.started) this.ready();
+    };
+    const onWaiting = () => {
+      if (token !== this.token || !this.started) return;
+      // Still frozen after a while: reopen the same stream quietly.
+      clearTimeout(this.stallTimer);
+      this.stallTimer = setTimeout(() => token === this.token && this.repair(), 12000);
+    };
     const onError = async () => {
       if (token !== this.token) return;
       let kind = v.error && v.error.code === 4 ? 'format' : 'network';
@@ -53,39 +67,75 @@ class RetryingPlayer {
           kind = 'network';
         }
       }
-      if (token === this.token) this.fail(kind);
+      if (token === this.token) this.problem(kind);
     };
     v.addEventListener('playing', onPlaying);
+    v.addEventListener('waiting', onWaiting);
     v.addEventListener('error', onError);
     this.unlisten = () => {
       v.removeEventListener('playing', onPlaying);
+      v.removeEventListener('waiting', onWaiting);
       v.removeEventListener('error', onError);
     };
     clearTimeout(this.timer);
     // A stream that never starts counts as failed.
-    this.httpCode = null;
-    this.timer = setTimeout(() => token === this.token && this.fail('network'), 25000);
+    this.timer = setTimeout(() => token === this.token && !this.started && this.problem('network'), 25000);
 
-    const isHls = /\.m3u8(\?|$)/i.test(url) || /\/hls\/|manifest/i.test(url);
-    const isTs = /\.ts(\?|$)/i.test(url) || (this.live && !/\.[a-z0-9]{2,4}(\?|$)/i.test(url.split('/').pop()));
+    const file = url.split('?')[0].split('/').pop();
+    const isHls = /\.m3u8$/i.test(file) || /\/hls\/|manifest/i.test(url);
+    const isTs = /\.ts$/i.test(file) || (this.live && !/\.[a-z0-9]{2,4}$/i.test(file));
+
     if (isHls && window.Hls && Hls.isSupported()) {
-      const hls = new Hls({ enableWorker: true, lowLatencyMode: false, startPosition: this.start > 0 ? this.start / 1000 : -1 });
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        // Start from a good picture instead of the lowest quality, then adapt.
+        abrEwmaDefaultEstimate: 8000000,
+        capLevelToPlayerSize: false,
+        maxBufferLength: 30,
+        liveSyncDurationCount: 4,
+        fragLoadingMaxRetry: 6,
+        manifestLoadingMaxRetry: 3,
+        levelLoadingMaxRetry: 4,
+        startPosition: this.start > 0 ? this.start / 1000 : -1,
+      });
+      let mediaFixes = 0;
       hls.on(Hls.Events.ERROR, (_e, data) => {
         if (!data.fatal || token !== this.token) return;
         const code = data.response && data.response.code;
         this.httpCode = code || null;
-        this.fail(data.type === Hls.ErrorTypes.MEDIA_ERROR ? 'format' : 'network');
+        if (this.started && data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          hls.startLoad();
+          return;
+        }
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR && mediaFixes < 2) {
+          mediaFixes++;
+          if (mediaFixes === 2) hls.swapAudioCodec();
+          hls.recoverMediaError();
+          return;
+        }
+        this.problem(data.type === Hls.ErrorTypes.MEDIA_ERROR ? 'format' : 'network');
       });
       hls.loadSource(url);
       hls.attachMedia(v);
       this.engine = { destroy: () => hls.destroy() };
       this.engineIsLibrary = true;
     } else if (isTs && window.mpegts && mpegts.getFeatureList().mseLivePlayback) {
-      const p = mpegts.createPlayer({ type: 'mpegts', isLive: this.live, url }, { enableWorker: true, lazyLoad: false, liveBufferLatencyChasing: true });
-      p.on(mpegts.Events.ERROR, (type, detail, info) => {
+      const p = mpegts.createPlayer({ type: 'mpegts', isLive: this.live, url }, {
+        enableWorker: true,
+        enableStashBuffer: true,
+        stashInitialSize: 1024 * 1024,
+        lazyLoad: false,
+        // Chasing the live edge makes the picture jump and go black: keep a steady buffer instead.
+        liveBufferLatencyChasing: false,
+        autoCleanupSourceBuffer: true,
+        autoCleanupMaxBackwardDuration: 60,
+        autoCleanupMinBackwardDuration: 30,
+      });
+      p.on(mpegts.Events.ERROR, (type, _detail, info) => {
         if (token !== this.token) return;
         this.httpCode = info && info.code ? info.code : null;
-        this.fail(type === mpegts.ErrorTypes.MEDIA_ERROR ? 'format' : 'network');
+        this.problem(type === mpegts.ErrorTypes.MEDIA_ERROR ? 'format' : 'network');
       });
       p.attachMediaElement(v);
       p.load();
@@ -102,6 +152,7 @@ class RetryingPlayer {
 
   ready() {
     clearTimeout(this.timer);
+    this.started = true;
     const a = this.current();
     if (!a) return;
     if (Repo.isXtream) Prefs.userAgent = a.ua;
@@ -112,11 +163,35 @@ class RetryingPlayer {
     this.onReady();
   }
 
+  /** Something went wrong: repair a stream that was playing, or try the next way to open it. */
+  problem(kind) {
+    if (this.started) {
+      this.repair();
+      return;
+    }
+    this.fail(kind);
+  }
+
+  /** Reopens the same stream, where it was. Gives up after too many repairs in a short time. */
+  repair() {
+    const now = Date.now();
+    this.repairs = (this.repairs || []).filter((t) => now - t < 60000);
+    if (this.repairs.length >= 4) {
+      this.started = false;
+      this.fail('network');
+      return;
+    }
+    this.repairs.push(now);
+    if (!this.live && this.video.currentTime > 0) this.start = this.video.currentTime * 1000;
+    const token = this.token;
+    setTimeout(() => token === this.token && this.load(), 800);
+  }
+
   fail(kind) {
     clearTimeout(this.timer);
+    clearTimeout(this.stallTimer);
     if (!this.attempts || !this.current()) return;
     const token = this.token;
-    this.lastKind = kind;
     if (!this.live && this.video.currentTime > 0) this.start = this.video.currentTime * 1000;
     if (kind === 'network' || this.attempts.length > 1) {
       // The first refusal often means the previous channel still holds the connection.
@@ -146,6 +221,7 @@ class RetryingPlayer {
   }
 
   teardown() {
+    clearTimeout(this.stallTimer);
     if (this.unlisten) {
       this.unlisten();
       this.unlisten = null;

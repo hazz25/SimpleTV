@@ -363,7 +363,7 @@ function HomeView() {
           if (!Updater.checked) await Updater.check();
           const current = await window.stv.version();
           if (Updater.newer(current)) {
-            update.textContent = `⬆  Nouvelle version ${Updater.latest} disponible  •  Télécharger`;
+            update.textContent = `⬆  Nouvelle version ${Updater.latest} disponible  •  Télécharger et installer`;
             update.onclick = () => window.stv.openExternal(Updater.downloadUrl);
             update.classList.remove('hidden');
           }
@@ -1109,7 +1109,7 @@ function SettingsView() {
         const items = [
           ['Liste utilisée', accountLine(), () => open(ListsView())],
           ['Format des chaînes en direct (Xtream)',
-            Prefs.liveFormat === 'ts' ? 'TS (recommandé). Changez si les chaînes ne se lancent pas.' : 'HLS (m3u8). Changez si les chaînes ne se lancent pas.',
+            Prefs.liveFormat === 'm3u8' ? 'HLS (recommandé sur PC). Changez si les chaînes ne se lancent pas.' : 'TS. Changez si les chaînes coupent ou ne se lancent pas.',
             () => { Prefs.liveFormat = Prefs.liveFormat === 'ts' ? 'm3u8' : 'ts'; refresh(); }],
           ['Changer de chaîne avec ▲ ▼', Prefs.invertZap ? 'Inversé : ▲ chaîne suivante' : 'Normal : ▼ chaîne suivante',
             () => { Prefs.invertZap = !Prefs.invertZap; refresh(); }],
