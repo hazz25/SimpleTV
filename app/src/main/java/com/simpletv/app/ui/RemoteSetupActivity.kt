@@ -44,7 +44,13 @@ class RemoteSetupActivity : BaseActivity() {
             return
         }
         val page = resources.openRawResource(R.raw.setup).bufferedReader().use { it.readText() }
-        val s = SetupServer(page) { type, form ->
+        val s = SetupServer(page, onLocked = {
+            runOnUiThread {
+                status.text = "Trop de tentatives avec un mauvais code : par sécurité, la connexion est coupée. Revenez en arrière puis rouvrez cet écran pour obtenir un nouveau QR code."
+                status.setTextColor(ContextCompat.getColor(this, R.color.gold))
+                qr.setImageDrawable(null)
+            }
+        }) { type, form ->
             runOnUiThread { status.text = "Vérification de la liste…" }
             try {
                 val list = Setup.verify(

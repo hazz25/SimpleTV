@@ -29,6 +29,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: true,
       // IPTV servers do not send the headers a browser page needs to read their streams.
       // The app only ever loads its own local page, so this is limited to reading streams and lists.
       webSecurity: false,

@@ -24,11 +24,16 @@ import kotlin.concurrent.thread
  */
 class SetupServer(
     private val page: String,
+    private val onLocked: () -> Unit = {},
     private val onList: suspend (type: String, fields: Map<String, String>) -> Playlist,
 ) {
     val token: String = randomToken()
     private var socket: ServerSocket? = null
     private val workers = Executors.newFixedThreadPool(4)
+
+    // Someone trying codes at random: after a few wrong ones the server shuts down for good.
+    private val wrongCodes = java.util.concurrent.atomic.AtomicInteger(0)
+    private val maxWrongCodes = 10
 
     /** Starts listening and returns the port. */
     fun start(): Int {
@@ -82,6 +87,10 @@ class SetupServer(
                 val query = parseForm(target.substringAfter('?', ""))
                 if (query["t"] != token) {
                     respond(c, 403, "text/plain", "Lien expiré : scannez à nouveau le QR code affiché sur la TV.")
+                    if (wrongCodes.incrementAndGet() >= maxWrongCodes) {
+                        stop()
+                        onLocked()
+                    }
                     return
                 }
                 when {
