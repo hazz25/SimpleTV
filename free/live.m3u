@@ -689,7 +689,7 @@ https://r.eu.cdn-redge.media/livehls/oeu/mt/live/m6_music_hits/live.livx/playlis
 https://edge12.vedge.infomaniak.com/livecast/ik:madrasfmtv/manifest.m3u8
 #EXTINF:-1 group-title="Français · Musique" tvg-logo="https://i.imgur.com/EVtWQLd.png",MCM Top
 http://185.228.163.146:8000/play/a00g/index.m3u8
-#EXTINF:-1 group-title="Français · Musique" tvg-logo="https://i.imgur.com/EVtWQLd.png",MCM Top
+#EXTINF:-1 group-title="Français · Musique" tvg-logo="https://i.imgur.com/EVtWQLd.png" backup-urls="http://s7.merlive.am/vipserial/index.m3u8",MCM Top
 http://46.32.176.50/mcmtop/index.m3u8
 #EXTINF:-1 group-title="Français · Musique" tvg-logo="https://i.imgur.com/9GVyQ6x.png",Melody
 https://r.eu.cdn-redge.media/livehls/oeu/mt/live/melody/live.livx/playlist.m3u8
@@ -759,8 +759,8 @@ https://video1.getstreamhosting.com:1936/8294/8294/playlist.m3u8
 https://stream.berosat.live/hls/esaie45-tv/esaie45-tv.m3u8
 #EXTINF:-1 group-title="Français · Religion" tvg-logo="https://i.imgur.com/v8TiqhH.png",Evandis Gospel TV
 https://evandis.streamakaci.tv/str_evandis_evandis/str_evandis_multi/playlist.m3u8
-#EXTINF:-1 group-title="Français · Religion" tvg-logo="https://i.imgur.com/sua70RO.png",EWTN Canada
-https://cdn3.wowza.com/1/YW5wSWZiRGd2eFlU/bGV0aVBq/hls/live/playlist.m3u8
+#EXTINF:-1 group-title="Français · Religion" tvg-logo="https://i.imgur.com/sua70RO.png" backup-urls="https://cdn3.wowza.com/1/YW5wSWZiRGd2eFlU/bGV0aVBq/hls/live/playlist.m3u8|https://cdn3.wowza.com/1/SmVrQmZCUXZhVDgz/b3J3MFJv/hls/live/playlist.m3u8",EWTN Spain & Latin America
+http://45.228.234.9:8000/play/a06v/index.m3u8
 #EXTINF:-1 group-title="Français · Religion" tvg-logo="https://i.imgur.com/3wC7tSG.jpeg",Exploits TV
 https://stream.berosat.live/hls/exploits-tv/exploits-tv.m3u8
 #EXTINF:-1 group-title="Français · Religion" tvg-logo="https://i.imgur.com/nynh5LY.png",Impact TV
@@ -975,7 +975,7 @@ https://mn-nl.mncdn.com/elsharq_live/live/playlist.m3u8
 https://livesstream.work.gd:5443/WebRTCApp/streams/stream.m3u8
 #EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://i.imgur.com/bTR0Huw.png",ERi-TV 1
 https://jmc-live.ercdn.net/eritreatv/eritreatv.m3u8
-#EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://i.imgur.com/1xERxmB.png",Fajer TV 1
+#EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://i.imgur.com/1xERxmB.png" backup-urls="https://video11.logicahost.com.br/ozfest/ozfest/playlist.m3u8",Fajer TV 1
 https://e.siar.us/live/ozfest.m3u8
 #EXTINF:-1 group-title="Arabe · Généralistes" tvg-logo="https://i.imgur.com/bM4VZDH.png",Hala London
 https://halalondon-live.ercdn.net/halalondon/halalondon.m3u8
