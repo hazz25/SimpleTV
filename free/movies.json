@@ -66,17 +66,6 @@
   "licence": "http://creativecommons.org/publicdomain/zero/1.0/"
  },
  {
-  "id": "LesPapillonsJaponais",
-  "title": "Les Papillons Japonais",
-  "year": "1908",
-  "plot": "Japanese Butterflies by Segundo de Chomón",
-  "duration": "4:08",
-  "poster": "https://archive.org/services/img/LesPapillonsJaponais",
-  "url": "https://archive.org/download/LesPapillonsJaponais/SegundoDeChomnLesPapillonsJaponais1908_512kb.mp4",
-  "category": "Français · Films libres de droits",
-  "licence": "http://creativecommons.org/publicdomain/zero/1.0/"
- },
- {
   "id": "LeCake-walkInfernal",
   "title": "Le Cake-Walk Infernal",
   "year": "1903",
@@ -86,6 +75,17 @@
   "url": "https://archive.org/download/LeCake-walkInfernal/1903GeorgesMlisLeCake-walkInfernal.mp4",
   "category": "Français · Films libres de droits",
   "licence": "http://creativecommons.org/publicdomain/mark/1.0/"
+ },
+ {
+  "id": "LesPapillonsJaponais",
+  "title": "Les Papillons Japonais",
+  "year": "1908",
+  "plot": "Japanese Butterflies by Segundo de Chomón",
+  "duration": "4:08",
+  "poster": "https://archive.org/services/img/LesPapillonsJaponais",
+  "url": "https://archive.org/download/LesPapillonsJaponais/SegundoDeChomnLesPapillonsJaponais1908_512kb.mp4",
+  "category": "Français · Films libres de droits",
+  "licence": "http://creativecommons.org/publicdomain/zero/1.0/"
  },
  {
   "id": "LantiqueTolde",
@@ -121,17 +121,6 @@
   "licence": "http://creativecommons.org/publicdomain/zero/1.0/"
  },
  {
-  "id": "SymphonieBizarre",
-  "title": "Symphonie Bizarre",
-  "year": "1909",
-  "plot": "NOTE: Only a fragment of this film survives. Here is what remains. By the time this short subject came out, Segundo de Chomón had bested Georges Melies at his own game. His camera magic was as fully developed as Melies. His sense of humor was sharper and his scenes had invaded the real world. Many of the shots of this split-reel short about a bizarre group of tramp musicians who disappear into and out of drums, beach umbrellas and whatnots are shot in the street and the others are on stages decorated to look realistic. But this unadorned magic show was nearing its end. Audiences were coming to expect the magic to support something, not to be the beginning and end of the show. Stop motion was",
-  "duration": "0:53",
-  "poster": "https://archive.org/services/img/SymphonieBizarre",
-  "url": "https://archive.org/download/SymphonieBizarre/1909SegundoDeChomon-SymphonieBizarrebizzareSymphonyFragment.mp4",
-  "category": "Français · Films libres de droits",
-  "licence": "http://creativecommons.org/publicdomain/mark/1.0/"
- },
- {
   "id": "LaSourianteMadameBeudet",
   "title": "La Souriante Madame Beudet",
   "year": "1922",
@@ -139,6 +128,17 @@
   "duration": "38",
   "poster": "https://archive.org/services/img/LaSourianteMadameBeudet",
   "url": "https://archive.org/download/LaSourianteMadameBeudet/LaSourianteMadameBeudet.mp4",
+  "category": "Français · Films libres de droits",
+  "licence": "http://creativecommons.org/publicdomain/mark/1.0/"
+ },
+ {
+  "id": "SymphonieBizarre",
+  "title": "Symphonie Bizarre",
+  "year": "1909",
+  "plot": "NOTE: Only a fragment of this film survives. Here is what remains. By the time this short subject came out, Segundo de Chomón had bested Georges Melies at his own game. His camera magic was as fully developed as Melies. His sense of humor was sharper and his scenes had invaded the real world. Many of the shots of this split-reel short about a bizarre group of tramp musicians who disappear into and out of drums, beach umbrellas and whatnots are shot in the street and the others are on stages decorated to look realistic. But this unadorned magic show was nearing its end. Audiences were coming to expect the magic to support something, not to be the beginning and end of the show. Stop motion was",
+  "duration": "0:53",
+  "poster": "https://archive.org/services/img/SymphonieBizarre",
+  "url": "https://archive.org/download/SymphonieBizarre/1909SegundoDeChomon-SymphonieBizarrebizzareSymphonyFragment.mp4",
   "category": "Français · Films libres de droits",
   "licence": "http://creativecommons.org/publicdomain/mark/1.0/"
  },
